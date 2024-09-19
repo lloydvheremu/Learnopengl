@@ -6,7 +6,7 @@ const char *vertexShaderSource = R"(
 	#version 330 core
 	layout (location = 0) in vec3 aPos;
 	void main() {
-		glPosition = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+		gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 	}
 )";
 const char *fragmentShaderSource = R"(
@@ -68,7 +68,7 @@ int main() {
 
 	};
 
-	unsigned int indices[] = {
+	GLuint indices[] = {
 		0, 1, 2,
 		3, 4, 5
 	};
@@ -102,27 +102,38 @@ int main() {
 	// FRAGMENT Shader
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
 
+	// Check Shader Compilation
+	int success;
+	char infoLog[512];
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" <<
+			infoLog << std::endl;
+	}
 	// LINK SHADERS TO SHADER PROGRAM
 	unsigned int shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
 
-	// Check Shader Compilation
-	int success;
-	char infoLog[512];
+
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		std::cerr << "ERROR::SHADER::Program::LINK_FAILED\n" << infoLog << std::endl;
 	}
 
+	std::cout << success;
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
 		// Process user input
 		processinput(window);
-		glClearColor(0.2f, 0.3f, 0.3f, 0.5f);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
@@ -141,6 +152,8 @@ int main() {
 	glDeleteProgram(shaderProgram);
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glFlush();
+	glFinish();
 	glfwTerminate();
 	return 0;
 }
