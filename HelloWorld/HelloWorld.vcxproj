@@ -138,7 +138,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Downloads\Compressed\glad\src\glad.c" />
-    <ClCompile Include="ex1_triangles.cpp" />
+    <ClCompile Include="ex2_triangles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
